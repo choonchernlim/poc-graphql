@@ -1,61 +1,54 @@
 # Backend
 
-This is a simple GraphQL API built with [FastAPI](https://fastapi.tiangolo.com/) and [Strawberry](https://strawberry.rocks/), managed by [uv](https://github.com/astral-sh/uv).
+The project demonstrates GraphQL's N+1 query problem and how it is solved using the **DataLoader** pattern.
 
 ## Prerequisites
 
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) installed.
 
-## Setup & Running
+## Getting Started
 
-1. **Install dependencies:**
-
+- Install dependencies:
 ```bash
 uv sync
 ```
 
-2. **Run the server:**
+## Interactive
 
+- Run the server:
 ```bash
 uv run uvicorn main:app --reload
 ```
 
-The API will be available at [http://127.0.0.1:8000/graphql](http://127.0.0.1:8000/graphql).
+- Visit http://127.0.0.1:8000/graphql
 
-## Testing & N+1 Problem Demonstration
-
-The project includes tests to demonstrate the N+1 query problem and how it is solved using the **DataLoader** pattern.
-
-To see the difference in database access patterns, run the tests with the `-v` (verbose) and `-s` (show stdout/logs) flags:
-
-```bash
-uv run pytest -v -s tests
+- `BadQuery` demonstrates the N+1 problem, where fetching accounts for each user results in multiple queries.
+```graphql
+query BadQuery {
+    users {
+        name
+        accountsNPlusOneProblem {
+            name
+        }
+    }
+}
 ```
 
-### Testcases:
-
-- **`test_n_plus_one_problem.py`**: You will see multiple `SQL EXECUTE` logs (one for each user) as the application fetches accounts sequentially.
-- **`test_dataloader.py`**: You will see a single `Batch fetching...` log followed by one optimized `SQL EXECUTE` query using `IN (?,?,?)`, demonstrating that all accounts were retrieved in a single trip to the database.
-
-## Schema
-
-The GraphQL schema includes `User` and `Account` types:
-
+- `GoodQuery` demonstrates the solution using DataLoader, where accounts for all users are fetched in a single batch query.
 ```graphql
-type Account {
-  id: ID!
-  userId: ID!
-  name: String!
+query GoodQuery {
+    users {
+        name
+        accounts {
+            name
+        }
+    }
 }
+```
 
-type User {
-  id: ID!
-  name: String!
-  accounts: [Account!]!
-}
+## Testcases
 
-type Query {
-  users: [User!]!
-  user(id: ID!): User
-}
+- Run tests:
+```bash
+uv run pytest -v -s tests
 ```

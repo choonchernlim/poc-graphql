@@ -5,7 +5,7 @@ from main import get_context
 @pytest.mark.asyncio
 async def test_dataloader_gql():
     query = """
-        query TestDataLoader {
+        query GoodQuery {
             users {
                 name
                 accounts {
@@ -25,7 +25,18 @@ async def test_dataloader_gql():
     assert result.data is not None
     
     users_data = result.data["users"]
-    expected_counts = {"Alice": 2, "Bob": 1, "Charlie": 0}
+    expected_counts = {
+        "Alice": 2,
+        "Bob": 1,
+        "Charlie": 0,
+        "Tom": 0,
+        "Josh": 0,
+        "Brady": 0,
+        "John": 0,
+        "Mike": 0,
+        "Mary": 0,
+        "Jane": 0,
+    }
 
     for user_data in users_data:
         name = user_data["name"]
