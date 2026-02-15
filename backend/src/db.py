@@ -23,12 +23,14 @@ def get_db_cursor():
         conn.close()
 
 def execute_fetchall(query: str, params: tuple = (), mapper: Optional[Callable[[sqlite3.Row], Any]] = None) -> List[Any]:
+    logging.info(f"SQL EXECUTE (fetchall): {query} with params {params}")
     with get_db_cursor() as cursor:
         cursor.execute(query, params)
         rows = cursor.fetchall()
     return [mapper(row) for row in rows] if mapper else rows
 
 def execute_fetchone(query: str, params: tuple = (), mapper: Optional[Callable[[sqlite3.Row], Any]] = None) -> Optional[Any]:
+    logging.info(f"SQL EXECUTE (fetchone): {query} with params {params}")
     with get_db_cursor() as cursor:
         cursor.execute(query, params)
         row = cursor.fetchone()
