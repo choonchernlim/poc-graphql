@@ -10,3 +10,6 @@ from .types import User
 class Query:
     users: List[User] = strawberry.field(resolver=get_users)
     user: Optional[User] = strawberry.field(resolver=get_user)
+
+
+schema = strawberry.Schema(query=Query)

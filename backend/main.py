@@ -1,13 +1,11 @@
 import logging
 
-import strawberry
 import uvicorn
 from fastapi import FastAPI
-from strawberry.dataloader import DataLoader
 from strawberry.fastapi import GraphQLRouter
 
-from src.db import load_accounts
-from src.schema import Query
+from src.db import get_accounts_loader
+from src.schema import schema
 
 logging.basicConfig(
     level=logging.INFO,
@@ -19,11 +17,9 @@ logging.basicConfig(
 
 async def get_context() -> dict:
     return {
-        "accounts_loader": DataLoader(load_fn=load_accounts),
+        "accounts_loader": get_accounts_loader(),
     }
 
-
-schema = strawberry.Schema(query=Query)
 
 # Create the GraphQL router
 graphql_app = GraphQLRouter(schema, context_getter=get_context)
