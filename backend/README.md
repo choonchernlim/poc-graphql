@@ -1,7 +1,7 @@
 # Backend
 
 The backend is built using FastAPI and Strawberry GraphQL. It simulates a simple user-account relationship to
-demonstrate the N+1 query problem and its solution using the DataLoader pattern.
+demonstrate the N+1 query problem and its solution using the Data Loader pattern.
 
 ## Prerequisites
 
