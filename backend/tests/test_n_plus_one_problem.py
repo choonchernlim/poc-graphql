@@ -1,21 +1,35 @@
 import pytest
-
-from src.db import get_users
-
+from src.schema import schema
+from main import get_context
 
 @pytest.mark.asyncio
-async def test_n_plus_one():
-    print("Fetching users...")
-    users = get_users()
+async def test_n_plus_one_gql():
+    query = """
+        query TestNPlusOne {
+            users {
+                name
+                accountsNPlusOneProblem {
+                    name
+                }
+            }
+        }
+    """
 
-    print("\n--- Testing N+1 (Direct DB Call) ---")
-    print("Observe the logs: You should see a separate 'Fetching accounts...' log for EACH user.")
+    print("\n--- Testing N+1 via GraphQL ---")
+    print("Observe the logs: You should see a separate 'SQL EXECUTE' log for EACH user's accounts.")
 
+    context = await get_context()
+    result = await schema.execute(query, context_value=context)
+
+    assert result.errors is None
+    assert result.data is not None
+    
+    users_data = result.data["users"]
     expected_counts = {"Alice": 2, "Bob": 1, "Charlie": 0}
-
-    for u in users:
-        # This calls get_accounts directly for each user
-        accounts = u.accounts_n_plus_one_problem()
+    
+    for user_data in users_data:
+        name = user_data["name"]
+        accounts = user_data["accountsNPlusOneProblem"]
         count = len(accounts)
-        print(f"User {u.name} has {count} accounts")
-        assert count == expected_counts[u.name]
+        print(f"User {name} has {count} accounts")
+        assert count == expected_counts[name]

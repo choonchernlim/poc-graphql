@@ -1,33 +1,35 @@
-import asyncio
-
 import pytest
-
-from src.db import get_users, get_accounts_loader
-
-
-# Mock context
-class MockInfo:
-    def __init__(self, loader):
-        self.context = {"accounts_loader": loader}
-
+from src.schema import schema
+from main import get_context
 
 @pytest.mark.asyncio
-async def test_dataloader():
-    print("Fetching users...")
-    users = get_users()
-    loader = get_accounts_loader()
-    info = MockInfo(loader)
+async def test_dataloader_gql():
+    query = """
+        query TestDataLoader {
+            users {
+                name
+                accounts {
+                    name
+                }
+            }
+        }
+    """
 
-    print("\n--- Testing Optimized (DataLoader) ---")
-    print("Observe the logs: You should see a SINGLE 'Batch fetching...' log for ALL users.")
+    print("\n--- Testing Optimized (DataLoader) via GraphQL ---")
+    print("Observe the logs: You should see a SINGLE 'Batch fetching...' and ONE 'SQL EXECUTE' log for ALL users.")
 
-    # We gather all the coroutines to run them concurrently, which allows the DataLoader to batch them
-    tasks = [u.accounts(info) for u in users]
-    results = await asyncio.gather(*tasks)
+    context = await get_context()
+    result = await schema.execute(query, context_value=context)
 
+    assert result.errors is None
+    assert result.data is not None
+    
+    users_data = result.data["users"]
     expected_counts = {"Alice": 2, "Bob": 1, "Charlie": 0}
 
-    for i, u in enumerate(users):
-        count = len(results[i])
-        print(f"User {u.name} has {count} accounts")
-        assert count == expected_counts[u.name]
+    for user_data in users_data:
+        name = user_data["name"]
+        accounts = user_data["accounts"]
+        count = len(accounts)
+        print(f"User {name} has {count} accounts")
+        assert count == expected_counts[name]
