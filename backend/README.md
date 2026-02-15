@@ -1,5 +1,7 @@
 # Backend
 
+[![Backend Tests](https://github.com/choonchernlim/poc-graphql/actions/workflows/backend-test.yml/badge.svg)](https://github.com/choonchernlim/poc-graphql/actions/workflows/backend-test.yml)
+
 The backend is built using FastAPI and Strawberry GraphQL. It simulates a simple user-account relationship to
 demonstrate the N+1 query problem and its solution using the Data Loader pattern.
 
