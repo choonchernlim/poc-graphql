@@ -1,5 +1,3 @@
-[![Backend Tests](https://github.com/choonchernlim/poc-graphql/actions/workflows/backend-test.yml/badge.svg?branch=main)](https://github.com/choonchernlim/poc-graphql/actions/workflows/backend-test.yml)
-
 # Backend
 
 The backend is built using FastAPI and Strawberry GraphQL. It simulates a simple user-account relationship to
