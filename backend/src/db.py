@@ -1,7 +1,9 @@
-from typing import List, Optional
-import strawberry
-from .types import User, Account
 import logging
+from typing import List, Optional
+
+import strawberry
+
+from .types import User, Account
 
 # Sample data
 users_db = [
@@ -21,10 +23,26 @@ def get_users() -> List[User]:
     logging.info("Fetching all users...")
     return users_db
 
+
 def get_user(user_id: strawberry.ID) -> Optional[User]:
     logging.info(f"Fetching user [id: {user_id}]...")
     return next((user for user in users_db if user.id == user_id), None)
 
+
 def get_accounts(user_id: strawberry.ID) -> List[Account]:
     logging.info(f"Fetching accounts for user [id: {user_id}]...")
     return [account for account in accounts_db if account.user_id == user_id]
+
+
+async def load_accounts(user_ids: List[strawberry.ID]) -> List[List[Account]]:
+    logging.info(f"Batch fetching accounts for user ids: {user_ids}")
+    # Group accounts by user_id
+    accounts_by_user = {}
+    for account in accounts_db:
+        if account.user_id in user_ids:
+            if account.user_id not in accounts_by_user:
+                accounts_by_user[account.user_id] = []
+            accounts_by_user[account.user_id].append(account)
+
+    # Return in order of user_ids
+    return [accounts_by_user.get(uid, []) for uid in user_ids]
