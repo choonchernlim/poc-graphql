@@ -1,5 +1,7 @@
 # [POC] GraphQL
 
+[![Backend Tests](https://github.com/choonchernlim/poc-graphql/actions/workflows/backend-test.yml/badge.svg)](https://github.com/choonchernlim/poc-graphql/actions/workflows/backend-test.yml)
+
 The project demonstrates GraphQL's N+1 query problem and how it is solved using the **DataLoader** pattern.
 
 - Follow the [instruction](backend/README.md) to run the backend.
