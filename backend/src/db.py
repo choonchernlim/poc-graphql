@@ -1,7 +1,8 @@
 import logging
 import sqlite3
+from collections import defaultdict
 from contextlib import contextmanager
-from typing import List, Optional
+from typing import List, Optional, Callable, Any
 
 import strawberry
 from strawberry.dataloader import DataLoader
@@ -20,6 +21,20 @@ def get_db_cursor():
         conn.commit()
     finally:
         conn.close()
+
+def execute_fetchall(query: str, params: tuple = (), mapper: Optional[Callable[[sqlite3.Row], Any]] = None) -> List[Any]:
+    with get_db_cursor() as cursor:
+        cursor.execute(query, params)
+        rows = cursor.fetchall()
+    return [mapper(row) for row in rows] if mapper else rows
+
+def execute_fetchone(query: str, params: tuple = (), mapper: Optional[Callable[[sqlite3.Row], Any]] = None) -> Optional[Any]:
+    with get_db_cursor() as cursor:
+        cursor.execute(query, params)
+        row = cursor.fetchone()
+    if row:
+        return mapper(row) if mapper else row
+    return None
 
 def init_db():
     with get_db_cursor() as cursor:
@@ -60,36 +75,29 @@ def init_db():
 # Initialize DB on module import
 init_db()
 
+def _row_to_user(row: sqlite3.Row) -> User:
+    return User(id=strawberry.ID(row["id"]), name=row["name"])
+
+def _row_to_account(row: sqlite3.Row) -> Account:
+    return Account(
+        id=strawberry.ID(row["id"]),
+        user_id=strawberry.ID(row["user_id"]),
+        name=row["name"]
+    )
+
 def get_users() -> List[User]:
     logging.info("Fetching all users from DB...")
-    with get_db_cursor() as cursor:
-        cursor.execute("SELECT id, name FROM user")
-        rows = cursor.fetchall()
-    return [User(id=strawberry.ID(row["id"]), name=row["name"]) for row in rows]
+    return execute_fetchall("SELECT id, name FROM user", mapper=_row_to_user)
 
 
 def get_user(user_id: strawberry.ID) -> Optional[User]:
     logging.info(f"Fetching user [id: {user_id}] from DB...")
-    with get_db_cursor() as cursor:
-        cursor.execute("SELECT id, name FROM user WHERE id = ?", (user_id,))
-        row = cursor.fetchone()
-    if row:
-        return User(id=strawberry.ID(row["id"]), name=row["name"])
-    return None
+    return execute_fetchone("SELECT id, name FROM user WHERE id = ?", (user_id,), mapper=_row_to_user)
 
 
 def get_accounts(user_id: strawberry.ID) -> List[Account]:
     logging.info(f"Fetching accounts for user [id: {user_id}] from DB...")
-    with get_db_cursor() as cursor:
-        cursor.execute("SELECT id, user_id, name FROM account WHERE user_id = ?", (user_id,))
-        rows = cursor.fetchall()
-    return [
-        Account(
-            id=strawberry.ID(row["id"]), 
-            user_id=strawberry.ID(row["user_id"]), 
-            name=row["name"]
-        ) for row in rows
-    ]
+    return execute_fetchall("SELECT id, user_id, name FROM account WHERE user_id = ?", (user_id,), mapper=_row_to_account)
 
 
 async def load_accounts(user_ids: List[strawberry.ID]) -> List[List[Account]]:
@@ -97,27 +105,14 @@ async def load_accounts(user_ids: List[strawberry.ID]) -> List[List[Account]]:
     placeholders = ",".join("?" for _ in user_ids)
     query = f"SELECT id, user_id, name FROM account WHERE user_id IN ({placeholders})"
     
-    with get_db_cursor() as cursor:
-        # Execute with the actual IDs
-        # Note: user_ids are strawberry.ID which are strings, so this is safe for sqlite text columns
-        cursor.execute(query, user_ids)
-        rows = cursor.fetchall()
+    # We use execute_fetchall to get mapped Account objects directly
+    accounts = execute_fetchall(query, tuple(user_ids), mapper=_row_to_account)
 
-    # Group accounts by user_id
-    accounts_by_user = {}
-    for row in rows:
-        uid = row["user_id"]
-        if uid not in accounts_by_user:
-            accounts_by_user[uid] = []
-        accounts_by_user[uid].append(
-            Account(
-                id=strawberry.ID(row["id"]),
-                user_id=strawberry.ID(row["user_id"]),
-                name=row["name"]
-            )
-        )
+    accounts_by_user = defaultdict(list)
+    for account in accounts:
+        # Group by user_id
+        accounts_by_user[str(account.user_id)].append(account)
 
-    # Return in order of requested user_ids
     return [accounts_by_user.get(str(uid), []) for uid in user_ids]
 
 def get_accounts_loader() -> DataLoader:
