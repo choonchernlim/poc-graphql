@@ -1,4 +1,4 @@
-# poc-graphql Frontend
+# Frontend
 
 A modern Next.js application built with TypeScript and Tailwind CSS, demonstrating how to integrate **Apollo Client** to consume a GraphQL API.
 
