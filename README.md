@@ -4,7 +4,10 @@
 
 The project demonstrates GraphQL's N+1 query problem and how it is solved using the **DataLoader** pattern.
 
-- Follow the [instruction](backend/README.md) to run the backend.
+- Run the [backend](backend/README.md).
+- Run the [frontend](frontend/README.md).
+
+![demo.gif](doc/demo.gif)
 
 ## N+1 Query Problem
 
@@ -47,9 +50,9 @@ INFO root Fetching accounts for user [id: 10] from DB...
 INFO root SQL EXECUTE (fetchall): SELECT id, user_id, name FROM account WHERE user_id = ? with params ('10',)
 ```
 
-## Data Loader Pattern
+## DataLoader Pattern
 
-`GoodQuery` demonstrates the solution using Data Loader, where accounts for all users are fetched in a single batch query.
+`GoodQuery` demonstrates the solution using DataLoader, where accounts for all users are fetched in a single batch query.
 
 ```graphql
 query GoodQuery {
