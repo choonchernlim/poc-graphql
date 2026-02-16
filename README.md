@@ -50,9 +50,9 @@ INFO root Fetching accounts for user [id: 10] from DB...
 INFO root SQL EXECUTE (fetchall): SELECT id, user_id, name FROM account WHERE user_id = ? with params ('10',)
 ```
 
-## Data Loader Pattern
+## DataLoader Pattern
 
-`GoodQuery` demonstrates the solution using Data Loader, where accounts for all users are fetched in a single batch query.
+`GoodQuery` demonstrates the solution using DataLoader, where accounts for all users are fetched in a single batch query.
 
 ```graphql
 query GoodQuery {
