@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# poc-graphql Frontend
+
+A modern Next.js application built with TypeScript and Tailwind CSS, demonstrating how to integrate **Apollo Client** to consume a GraphQL API.
+
+## Description
+
+This frontend provides a clean, responsive interface to view users and their associated accounts. It is designed to work seamlessly with the FastAPI/Strawberry backend located in the `backend/` directory.
+
+### Key Features
+- **Apollo Client Integration**: Configured with a dedicated wrapper to provide GraphQL capabilities across the app.
+- **Dynamic Data Fetching**: Uses the `useQuery` hook to fetch and display real-time data from the backend.
+- **Tailwind CSS Styling**: A polished, table-based UI for clear data presentation.
+- **TypeScript Powered**: Fully typed interfaces for GraphQL responses, ensuring type safety and better developer experience.
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- **Node.js**: Version 18.x or later.
+- **Backend**: Ensure the [FastAPI backend](../backend/README.md) is running at `http://localhost:8000/graphql`.
 
+### 1. Installation
+Navigate to this directory and install the dependencies:
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+cd frontend
+npm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### 2. Run the Development Server
+Start the Next.js development server:
+```bash
+npm run dev
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### 3. View the App
+Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
+
+## Project Structure
+
+- `src/app/`: Next.js App Router pages and layouts.
+- `src/components/`: Reusable React components (e.g., `UserList.tsx`).
+- `src/lib/`: Library configurations, including `apollo-wrapper.tsx`.
 
 ## Learn More
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [Next.js Documentation](https://nextjs.org/docs)
+- [Apollo Client Docs](https://www.apollographql.com/docs/react/)
+- [Tailwind CSS Docs](https://tailwindcss.com/docs)

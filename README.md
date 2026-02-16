@@ -5,6 +5,9 @@
 The project demonstrates GraphQL's N+1 query problem and how it is solved using the **DataLoader** pattern.
 
 - Follow the [instruction](backend/README.md) to run the backend.
+- Follow the [instruction](frontend/README.md) to run the frontend.
+
+![demo.gif](doc/demo.gif)
 
 ## N+1 Query Problem
 
